@@ -1,0 +1,4 @@
+# cat=email; type=string; label=LLL:EXT:reset_scheduler/Resources/Private/Language/ExtConf.xlf:emailFromAddress
+emailFromAddress =
+# cat=email; type=string; label=LLL:EXT:reset_scheduler/Resources/Private/Language/ExtConf.xlf:emailFromName
+emailFromName =

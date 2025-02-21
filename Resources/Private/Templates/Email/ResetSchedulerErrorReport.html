@@ -1,0 +1,58 @@
+<html lang="en"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      data-namespace-typo3-fluid="true">
+
+<f:layout name="SystemEmail" />
+
+<f:section name="Title">{headline}</f:section>
+
+<f:section name="Main">
+    <f:if condition="{introduction}">
+        <h4>{introduction}</h4>
+    </f:if>
+
+    <f:render section="renderErrorClasses" arguments="{_all}"/>
+    <f:render section="renderTasksWithError" arguments="{_all}"/>
+</f:section>
+
+<f:section name="renderErrorClasses">
+    <f:if condition="{errorClasses}">
+        <h2>Error Classes</h2>
+
+        <f:for each="{errorClasses}" as="errorClass">
+            <p>{errorClass.classTitle} (UID: {errorClass.uid})</p>
+            <f:if condition="{errorClass.description}">
+                <p>Description: {errorClass.description}</p>
+            </f:if>
+            <f:if condition="{errorClass.additionalInformation}">
+                <p>Additional Information: {errorClass.additionalInformation}</p>
+            </f:if>
+            <ul>
+                <li>Class: {errorClass.class}</li>
+                <li>Error: {errorClass.errorMessage}</li>
+            </ul>
+        </f:for>
+    </f:if>
+</f:section>
+
+<f:section name="renderTasksWithError">
+    <f:if condition="{tasksWithError}">
+        <h2>Tasks with error</h2>
+
+        <f:for each="{tasksWithError}" as="taskWithError">
+            <p>{taskWithError.classTitle} (UID: {taskWithError.uid})</p>
+            <f:if condition="{taskWithError.description}">
+                <p>Description: {taskWithError.description}</p>
+            </f:if>
+            <f:if condition="{taskWithError.additionalInformation}">
+                <p>Additional Information: {taskWithError.additionalInformation}</p>
+            </f:if>
+            <ul>
+                <li>Class: {taskWithError.class}</li>
+                <li>Error code: {taskWithError.lastExecutionFailureCode}</li>
+                <li>Error message: {taskWithError.lastExecutionFailureMessage}</li>
+            </ul>
+        </f:for>
+    </f:if>
+</f:section>
+</html>

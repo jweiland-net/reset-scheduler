@@ -1,0 +1,15 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  JWeiland\ResetScheduler\:
+    resource: '../Classes/*'
+
+  JWeiland\ResetScheduler\Command\ResetSchedulerCommand:
+    tags:
+    - name: 'console.command'
+      command: 'scheduler:reset'
+      description: 'Send email when another scheduler task breaks or reset failing scheduler tasks'
+      schedulable: true

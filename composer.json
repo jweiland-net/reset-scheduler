@@ -1,0 +1,36 @@
+{
+	"name": "jweiland/reset-scheduler",
+	"type": "typo3-cms-extension",
+	"description": "Reset scheduler tasks",
+	"license": "GPL-2.0-or-later",
+	"keywords": ["typo3", "TYPO3 CMS", "scheduler", "task", "reset"],
+	"homepage": "https://jweiland.net",
+	"authors": [
+		{
+			"name": "Stefan Froemken",
+			"email": "sfroemken@jweiland.net",
+			"role": "Lead Developer"
+		}
+	],
+	"support": {
+		"email": "projects@jweiland.net"
+	},
+	"require": {
+		"typo3/cms-core": "^11.5 || ^12.4",
+		"typo3/cms-scheduler": "^11.5 || ^12.4"
+	},
+	"replace": {
+		"typo3-ter/reset-scheduler": "self.version",
+		"typo3-ter/reset_scheduler": "self.version"
+	},
+	"autoload": {
+		"psr-4": {
+			"JWeiland\\ResetScheduler\\": "Classes"
+		}
+	},
+	"extra": {
+		"typo3/cms": {
+			"extension-key": "reset_scheduler"
+		}
+	}
+}
