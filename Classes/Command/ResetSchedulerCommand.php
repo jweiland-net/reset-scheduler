@@ -13,12 +13,12 @@ namespace JWeiland\ResetScheduler\Command;
 
 use JWeiland\ResetScheduler\Configuration\ExtConf;
 use JWeiland\ResetScheduler\Configuration\ResetSchedulerConfiguration;
+use JWeiland\ResetScheduler\Domain\Repository\SchedulerTaskRepository;
 use JWeiland\ResetScheduler\Service\SchedulerService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use TYPO3\CMS\Scheduler\Domain\Repository\SchedulerTaskRepository;
 
 /**
  * A command to check failed/broken scheduler task and send info mail, if error detected

@@ -12,3 +12,6 @@ services:
     - name: 'console.command'
       command: 'scheduler:reset'
       description: 'Send email when another scheduler task breaks or reset failing scheduler tasks'
+
+  JWeiland\ResetScheduler\Configuration\ExtConf:
+    factory: [null, 'create']

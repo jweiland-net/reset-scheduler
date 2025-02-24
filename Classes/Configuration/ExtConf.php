@@ -19,8 +19,7 @@ use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 /**
  * This class will streamline the values from extension manager configuration
  */
-#[Autoconfigure(constructor: 'create')]
-final readonly class ExtConf
+final class ExtConf
 {
     private const EXT_KEY = 'reset_scheduler';
 
@@ -35,7 +34,7 @@ final readonly class ExtConf
 
     public function __construct(
         string $emailFromAddress = self::DEFAULT_SETTINGS['emailFromAddress'],
-        string $emailFromName = self::DEFAULT_SETTINGS['emailFromName'],
+        string $emailFromName = self::DEFAULT_SETTINGS['emailFromName']
     ) {
         $this->emailFromAddress = $emailFromAddress;
         $this->emailFromName = $emailFromName;
@@ -49,14 +48,14 @@ final readonly class ExtConf
         try {
             $extensionSettings = array_merge(
                 $extensionSettings,
-                $extensionConfiguration->get(self::EXT_KEY),
+                $extensionConfiguration->get(self::EXT_KEY)
             );
-        } catch (ExtensionConfigurationExtensionNotConfiguredException|ExtensionConfigurationPathDoesNotExistException) {
+        } catch (ExtensionConfigurationExtensionNotConfiguredException|ExtensionConfigurationPathDoesNotExistException $exception) {
         }
 
         return new self(
-            emailFromAddress: (string)$extensionSettings['emailFromAddress'],
-            emailFromName: (string)$extensionSettings['emailFromName'],
+            (string)$extensionSettings['emailFromAddress'],
+            (string)$extensionSettings['emailFromName'],
         );
     }
 

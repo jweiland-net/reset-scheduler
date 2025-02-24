@@ -13,30 +13,27 @@ namespace JWeiland\ResetScheduler\Service;
 
 use JWeiland\ResetScheduler\Configuration\ExtConf;
 use JWeiland\ResetScheduler\Configuration\ResetSchedulerConfiguration;
-use Psr\Log\LoggerInterface;
+use JWeiland\ResetScheduler\Domain\Repository\SchedulerTaskRepository;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mime\Address;
 use TYPO3\CMS\Core\Mail\FluidEmail;
-use TYPO3\CMS\Core\Mail\MailerInterface;
+use TYPO3\CMS\Core\Mail\Mailer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Scheduler\Domain\Repository\SchedulerTaskRepository;
 
-class SchedulerService
+class SchedulerService implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     private SchedulerTaskRepository $taskRepository;
 
     private ExtConf $extConf;
 
-    private LoggerInterface $logger;
-
-    public function __construct(
-        SchedulerTaskRepository $schedulerTaskRepository,
-        ExtConf $extConf,
-        LoggerInterface $logger
-    ) {
+    public function __construct(SchedulerTaskRepository $schedulerTaskRepository, ExtConf $extConf)
+    {
         $this->taskRepository = $schedulerTaskRepository;
         $this->extConf = $extConf;
-        $this->logger = $logger;
     }
 
     public function process(ResetSchedulerConfiguration $configuration): void
@@ -55,7 +52,7 @@ class SchedulerService
             $this->processErrorClasses($configuration->getErrorClasses(), $fluidMail);
             $this->processExecutionTimeoutTasks($configuration->getTasksGreaterExecutionTimeout(), $fluidMail);
             $this->processTasksWithError($configuration->getTasksWithError(), $fluidMail);
-            GeneralUtility::makeInstance(MailerInterface::class)->send($fluidMail);
+            GeneralUtility::makeInstance(Mailer::class)->send($fluidMail);
         } catch (TransportExceptionInterface $exception) {
             $this->logger->warning('EXT:reset_scheduler mail error: ' . $exception->getMessage());
         }
