@@ -66,6 +66,12 @@ class ResetSchedulerCommand extends Command
                 'r',
                 InputOption::VALUE_NONE,
                 'Reset scheduler tasks to re-run them on next cron job call',
+            )
+            ->addOption(
+                'info',
+                'i',
+                InputOption::VALUE_NONE,
+                'Just show an info, if there are any failing tasks. Any other options are not processed.',
             );
     }
 
@@ -90,6 +96,11 @@ class ResetSchedulerCommand extends Command
 
             if (!$configuration->hasFailingTasks()) {
                 $output->writeln('No failing tasks found');
+                return Command::SUCCESS;
+            }
+
+            if ($input->getOption('info')) {
+                $output->writeln('Found failing tasks');
                 return Command::SUCCESS;
             }
 
