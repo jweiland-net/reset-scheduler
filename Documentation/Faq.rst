@@ -41,6 +41,11 @@ Frequently Asked Questions (FAQ)
         ..  note
             You will only get email, if there are any failing tasks.
 
+        ..  note
+            Please check if tasks are configured as "recurring". "Single" tasks
+            will be executed and immediate disabled. Remember: Disabled tasks
+            will not be fetched/processed.
+
     ..  accordion-item:: I still have tasks with errors in BE of scheduler
         :name: still-having-errors
         :header-level: 2
