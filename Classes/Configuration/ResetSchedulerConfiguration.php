@@ -12,19 +12,30 @@ declare(strict_types=1);
 namespace JWeiland\ResetScheduler\Configuration;
 
 
+use TYPO3\CMS\Core\Utility\MathUtility;
+
 class ResetSchedulerConfiguration
 {
+    public const DEFAULT_TIMEOUT = 60 * 60;
+
     private array $failedAndGroupedTasks;
 
     private string $infoMail;
 
-    private int $timeout;
+    private int $executionTimeout;
 
-    public function __construct(array $failedAndGroupedTasks, string $infoMail, int $timeout)
-    {
+    private bool $reset;
+
+    public function __construct(
+        array $failedAndGroupedTasks,
+        string $infoMail,
+        int $executionTimeout,
+        bool $reset
+    ) {
         $this->failedAndGroupedTasks = $failedAndGroupedTasks;
         $this->infoMail = $infoMail;
-        $this->timeout = $timeout;
+        $this->executionTimeout = $executionTimeout;
+        $this->reset = $reset;
     }
 
     /**
@@ -37,24 +48,37 @@ class ResetSchedulerConfiguration
         return $this->failedAndGroupedTasks['errorClasses'] ?? [];
     }
 
-    public function getGroupedTasks(): array
+    /**
+     * Returns all tasks grouped, but without any filtering.
+     * It also contains deactivated tasks.
+     * Keep public. Use some of the other methods in this class.
+     */
+    private function getGroupedTasks(): array
     {
         return $this->failedAndGroupedTasks['taskGroupsWithTasks'] ?? [];
     }
 
+    /**
+     * Returns all active single and recurring tasks
+     */
     public function getTasks(): array
     {
         $tasks = [];
 
         foreach ($this->getGroupedTasks() as $groupWithTasks) {
             foreach ($groupWithTasks['tasks'] as $task) {
-                $tasks[] = $task;
+                if (($task['disabled'] ?? false) === false) {
+                    $tasks[] = $task;
+                }
             }
         }
 
         return $tasks;
     }
 
+    /**
+     * Returns all active single and recurring tasks with error
+     */
     public function getTasksWithError(): array
     {
         return array_filter($this->getTasks(), static function($task): bool {
@@ -62,13 +86,42 @@ class ResetSchedulerConfiguration
         });
     }
 
-    public function getInfoMail(): string
+    /**
+     * Returns all active single and recurring tasks where execution timeout exceeds
+     */
+    public function getTasksGreaterExecutionTimeout(): array
     {
-        return $this->infoMail;
+        $executionTimeout = $this->getExecutionTimeout();
+
+        return array_filter($this->getTasks(), static function($task) use ($executionTimeout): bool {
+            return ($task['isRunning'] ?? false)
+                && ($task['lastExecutionTime'] ?? 0)
+                && time() > $task['lastExecutionTime'] + $executionTimeout;
+        });
     }
 
-    public function getTimeout(): int
+    /**
+     * Check for any failing tasks
+     */
+    public function hasFailingTasks(): bool
     {
-        return $this->timeout;
+        return $this->getErrorClasses()
+            || $this->getTasksWithError()
+            || $this->getTasksGreaterExecutionTimeout();
+    }
+
+    public function getInfoMail(): string
+    {
+        return trim($this->infoMail);
+    }
+
+    public function getExecutionTimeout(): int
+    {
+        return MathUtility::forceIntegerInRange($this->executionTimeout, 1, self::DEFAULT_TIMEOUT);
+    }
+
+    public function isReset(): bool
+    {
+        return $this->reset;
     }
 }

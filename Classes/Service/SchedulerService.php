@@ -14,6 +14,7 @@ namespace JWeiland\ResetScheduler\Service;
 use JWeiland\ResetScheduler\Configuration\ExtConf;
 use JWeiland\ResetScheduler\Configuration\ResetSchedulerConfiguration;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mime\Address;
 use TYPO3\CMS\Core\Mail\FluidEmail;
 use TYPO3\CMS\Core\Mail\MailerInterface;
@@ -40,20 +41,48 @@ class SchedulerService
 
     public function process(ResetSchedulerConfiguration $configuration): void
     {
-        if ($configuration->getInfoMail() && $this->extConf->getEmailFromAddress()) {
-            $fluidMail = $this->getFluidMail($configuration->getInfoMail());
+        if ($configuration->isReset()) {
+            $this->resetFailingTasks($configuration->getTasksGreaterExecutionTimeout());
+        }
 
+        if ($configuration->getInfoMail() === '' || $this->extConf->getEmailFromAddress() === '') {
+            $this->logger->warning('EXT:reset_scheduler can not send info mail as mail FROM is not configured');
+            return;
+        }
+
+        try {
+            $fluidMail = $this->getFluidMail($configuration->getInfoMail());
             $this->processErrorClasses($configuration->getErrorClasses(), $fluidMail);
+            $this->processExecutionTimeoutTasks($configuration->getTasksGreaterExecutionTimeout(), $fluidMail);
             $this->processTasksWithError($configuration->getTasksWithError(), $fluidMail);
             GeneralUtility::makeInstance(MailerInterface::class)->send($fluidMail);
-        } else {
-            $this->logger->warning('EXT:reset_scheduler can not send info mail as mail FROM is not configured');
+        } catch (TransportExceptionInterface $exception) {
+            $this->logger->warning('EXT:reset_scheduler mail error: ' . $exception->getMessage());
+        }
+    }
+
+    private function resetFailingTasks(array $failedTasks): void
+    {
+        foreach ($failedTasks as $failedTask) {
+            try {
+                $task = $this->taskRepository->findByUid((int)$failedTask['uid']);
+                if ($this->taskRepository->isTaskMarkedAsRunning($task)) {
+                    $this->taskRepository->removeAllRegisteredExecutionsForTask($task);
+                }
+            } catch (\OutOfBoundsException|\UnexpectedValueException $exception) {
+                $this->logger->error('EXT:reset_scheduler task error: ' . $exception->getMessage());
+            }
         }
     }
 
     private function processErrorClasses(array $errorClasses, FluidEmail $fluidEmail): void
     {
         $fluidEmail->assign('errorClasses', $errorClasses);
+    }
+
+    private function processExecutionTimeoutTasks(array $tasksGreaterExecutionTimeout, FluidEmail $fluidEmail): void
+    {
+        $fluidEmail->assign('executionTimeoutTasks', $tasksGreaterExecutionTimeout);
     }
 
     private function processTasksWithError(array $tasksWithError, FluidEmail $fluidEmail): void

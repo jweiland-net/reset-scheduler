@@ -7,29 +7,42 @@
 <f:section name="Title">{headline}</f:section>
 
 <f:section name="Main">
-    <f:if condition="{introduction}">
-        <h4>{introduction}</h4>
-    </f:if>
-
     <f:render section="renderErrorClasses" arguments="{_all}"/>
+    <f:render section="renderExecutionTimeoutTasks" arguments="{_all}"/>
     <f:render section="renderTasksWithError" arguments="{_all}"/>
 </f:section>
 
 <f:section name="renderErrorClasses">
     <f:if condition="{errorClasses}">
-        <h2>Error Classes</h2>
+        <h3>Invalid tasks</h3>
+        <p>
+            Following tasks contain hard errors like task can not be unserialized from tx_scheduler_task record
+            or task does not extends the scheduler AbstractTask class
+            or task contains invalid information about execution times
+            or task class is not registered in task repository.
+        </p>
 
-        <f:for each="{errorClasses}" as="errorClass">
-            <p>{errorClass.classTitle} (UID: {errorClass.uid})</p>
-            <f:if condition="{errorClass.description}">
-                <p>Description: {errorClass.description}</p>
-            </f:if>
-            <f:if condition="{errorClass.additionalInformation}">
-                <p>Additional Information: {errorClass.additionalInformation}</p>
-            </f:if>
+        <f:for each="{errorClasses}" as="task">
+            <f:render section="renderTaskInformation" arguments="{_all}"/>
             <ul>
-                <li>Class: {errorClass.class}</li>
-                <li>Error: {errorClass.errorMessage}</li>
+                <li>Class: {task.class}</li>
+                <f:if condition="{task.errorMessage}">
+                    <li>Error: {task.errorMessage}</li>
+                </f:if>
+            </ul>
+        </f:for>
+    </f:if>
+</f:section>
+
+<f:section name="renderExecutionTimeoutTasks">
+    <f:if condition="{executionTimeoutTasks}">
+        <h3>Tasks exceeding execution timeout</h3>
+        <p>Following running tasks exceed the defined timeout</p>
+
+        <f:for each="{executionTimeoutTasks}" as="task">
+            <f:render section="renderTaskInformation" arguments="{_all}"/>
+            <ul>
+                <li>Class: {task.class}</li>
             </ul>
         </f:for>
     </f:if>
@@ -37,22 +50,31 @@
 
 <f:section name="renderTasksWithError">
     <f:if condition="{tasksWithError}">
-        <h2>Tasks with error</h2>
+        <h3>Tasks with error</h3>
+        <p>Following tasks results into exception</p>
 
-        <f:for each="{tasksWithError}" as="taskWithError">
-            <p>{taskWithError.classTitle} (UID: {taskWithError.uid})</p>
-            <f:if condition="{taskWithError.description}">
-                <p>Description: {taskWithError.description}</p>
-            </f:if>
-            <f:if condition="{taskWithError.additionalInformation}">
-                <p>Additional Information: {taskWithError.additionalInformation}</p>
-            </f:if>
+        <f:for each="{tasksWithError}" as="task">
+            <f:render section="renderTaskInformation" arguments="{_all}"/>
             <ul>
-                <li>Class: {taskWithError.class}</li>
-                <li>Error code: {taskWithError.lastExecutionFailureCode}</li>
-                <li>Error message: {taskWithError.lastExecutionFailureMessage}</li>
+                <li>Class: {task.class}</li>
+                <f:if condition="{task.lastExecutionFailureCode}">
+                    <li>Error code: {task.lastExecutionFailureCode}</li>
+                </f:if>
+                <f:if condition="{task.lastExecutionFailureMessage}">
+                    <li>Error message: {task.lastExecutionFailureMessage}</li>
+                </f:if>
             </ul>
         </f:for>
+    </f:if>
+</f:section>
+
+<f:section name="renderTaskInformation">
+    <p><strong>{task.classTitle} (UID: {task.uid})</strong></p>
+    <f:if condition="{task.description}">
+        <p>Description: {task.description}</p>
+    </f:if>
+    <f:if condition="{task.additionalInformation}">
+        <p>Additional Information: {task.additionalInformation}</p>
     </f:if>
 </f:section>
 </html>

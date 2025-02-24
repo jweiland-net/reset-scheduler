@@ -63,18 +63,18 @@ final readonly class ExtConf
     public function getEmailFromAddress(): string
     {
         if ($this->emailFromAddress === '') {
-            return $GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromAddress'];
+            return trim($GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromAddress']);
         }
 
-        return $this->emailFromAddress;
+        return trim($this->emailFromAddress);
     }
 
     public function getEmailFromName(): string
     {
         if ($this->emailFromName === '') {
-            return $GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromName'];
+            return trim($GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromName']);
         }
 
-        return $this->emailFromName;
+        return trim($this->emailFromName);
     }
 }

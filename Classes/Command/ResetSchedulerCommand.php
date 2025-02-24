@@ -47,55 +47,88 @@ class ResetSchedulerCommand extends Command
     public function configure(): void
     {
         $this
-            ->setDescription('Reset scheduler tasks and send info mail on error')
-            ->addOption(
-                'set-timeout',
-                't',
-                InputOption::VALUE_OPTIONAL,
-                'Send information mail about failed tasks or reset task after this timeout exceeds',
-                24 * 60 * 60,
-            )
+            ->setDescription('Reset scheduler tasks and/or send info mail on error')
             ->addOption(
                 'email',
                 'm',
                 InputOption::VALUE_OPTIONAL,
                 'If set, the command will sent error of failed task via email',
+            )
+            ->addOption(
+                'execution-timeout',
+                't',
+                InputOption::VALUE_OPTIONAL,
+                'Set timeout for tasks which are currently running and exceeds the given timeout',
+                ResetSchedulerConfiguration::DEFAULT_TIMEOUT,
+            )
+            ->addOption(
+                'reset',
+                'r',
+                InputOption::VALUE_NONE,
+                'Reset scheduler tasks to re-run them on next cron job call',
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $groupedTasks = $this->taskRepository->getGroupedTasks();
+        try {
+            $isReset = (bool)$input->getOption('reset');
+            $infoMail = (string)$input->getOption('email');
 
-        $infoMail = (string)$input->getOption('email');
+            // Early return, if either mail system is configured nor reset-option is active
+            if (!$this->isMailSystemConfigured($infoMail, $output) && !$isReset) {
+                $output->writeln('<error>Either mail nor reset is activated. Nothing to do. End.</error>');
+                return Command::SUCCESS;
+            }
+
+            $configuration = new ResetSchedulerConfiguration(
+                $this->taskRepository->getGroupedTasks(),
+                $infoMail,
+                (int)$input->getOption('execution-timeout'),
+                $isReset,
+            );
+
+            if (!$configuration->hasFailingTasks()) {
+                $output->writeln('No failing tasks found');
+                return Command::SUCCESS;
+            }
+
+            $output->writeln('Start processing failing tasks');
+            $this->schedulerService->process($configuration);
+
+            if ($isReset) {
+                $output->writeln('Failing tasks were reset');
+            }
+
+            if ($this->isMailSystemConfigured($infoMail, $output)) {
+                $output->writeln('A mail about failing tasks was send');
+            }
+        } catch (\Exception|\Throwable $exception) {
+            $output->writeln('Error: ' . $exception->getMessage());
+        }
+
+        // This task must work in any case.
+        // Try to catch whatever error messages, log them, mail them, but do not return values greater than 0,
+        // as this task will also be stopped then.
+        return Command::SUCCESS;
+    }
+
+    private function isMailSystemConfigured(string $infoMail, OutputInterface $output): bool
+    {
         if ($infoMail === '') {
             $output->writeln(
                 '<comment>Mail receiver is empty, so no one will be informed about failing scheduler tasks</comment>'
             );
+            return false;
         }
 
         if ($this->extConf->getEmailFromAddress() === '') {
             $output->writeln(
                 '<comment>Mail FROM is not configured. Please check mailFromAddress in Installtool or reset_scheduler extension settings</comment>'
             );
+            return false;
         }
 
-        $configuration = new ResetSchedulerConfiguration(
-            $groupedTasks,
-            $infoMail,
-            (int)$input->getOption('set-timeout'),
-        );
-
-        $output->writeln(sprintf(
-            'Found %d tasks to process',
-            count($configuration->getTasks())
-        ));
-
-
-        $this->schedulerService->process($configuration);
-
-        $output->writeln('Done');
-
-        return Command::SUCCESS;
+        return true;
     }
 }
