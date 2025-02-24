@@ -25,11 +25,20 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ResetSchedulerCommand extends Command
 {
-    private SchedulerTaskRepository $taskRepository;
+    /**
+     * @var SchedulerTaskRepository
+     */
+    private $taskRepository;
 
-    private SchedulerService $schedulerService;
+    /**
+     * @var SchedulerService
+     */
+    private $schedulerService;
 
-    private ExtConf $extConf;
+    /**
+     * @var ExtConf
+     */
+    private $extConf;
 
     public function __construct(
         SchedulerTaskRepository $schedulerTaskRepository,
@@ -52,26 +61,26 @@ class ResetSchedulerCommand extends Command
                 'email',
                 'm',
                 InputOption::VALUE_OPTIONAL,
-                'If set, the command will sent error of failed task via email',
+                'If set, the command will sent error of failed task via email'
             )
             ->addOption(
                 'execution-timeout',
                 't',
                 InputOption::VALUE_OPTIONAL,
                 'Set timeout for tasks which are currently running and exceeds the given timeout',
-                ResetSchedulerConfiguration::DEFAULT_TIMEOUT,
+                ResetSchedulerConfiguration::DEFAULT_TIMEOUT
             )
             ->addOption(
                 'reset',
                 'r',
                 InputOption::VALUE_NONE,
-                'Reset scheduler tasks to re-run them on next cron job call',
+                'Reset scheduler tasks to re-run them on next cron job call'
             )
             ->addOption(
                 'info',
                 'i',
                 InputOption::VALUE_NONE,
-                'Just show an info, if there are any failing tasks. Any other options are not processed.',
+                'Just show an info, if there are any failing tasks. Any other options are not processed.'
             );
     }
 
@@ -91,7 +100,7 @@ class ResetSchedulerCommand extends Command
                 $this->taskRepository->getGroupedTasks(),
                 $infoMail,
                 (int)$input->getOption('execution-timeout'),
-                $isReset,
+                $isReset
             );
 
             if (!$configuration->hasFailingTasks()) {

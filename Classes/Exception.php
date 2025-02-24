@@ -15,5 +15,6 @@ use TYPO3\CMS\Core\Exception as CoreException;
 
 /**
  * A generic scheduler exception
+ * SF: This is the original class content backported from EXT:scheduler of TYPO3 12
  */
 class Exception extends CoreException {}

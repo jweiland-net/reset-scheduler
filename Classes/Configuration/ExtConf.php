@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace JWeiland\ResetScheduler\Configuration;
 
-use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationExtensionNotConfiguredException;
 use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationPathDoesNotExistException;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
@@ -23,9 +22,15 @@ final class ExtConf
 {
     private const EXT_KEY = 'reset_scheduler';
 
-    private string $emailFromAddress;
+    /**
+     * @var string
+     */
+    private $emailFromAddress;
 
-    private string $emailFromName;
+    /**
+     * @var string
+     */
+    private $emailFromName;
 
     private const DEFAULT_SETTINGS = [
         'emailFromAddress' => '',
@@ -55,7 +60,7 @@ final class ExtConf
 
         return new self(
             (string)$extensionSettings['emailFromAddress'],
-            (string)$extensionSettings['emailFromName'],
+            (string)$extensionSettings['emailFromName']
         );
     }
 

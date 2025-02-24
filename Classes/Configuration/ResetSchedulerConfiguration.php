@@ -18,13 +18,25 @@ class ResetSchedulerConfiguration
 {
     public const DEFAULT_TIMEOUT = 60 * 60;
 
-    private array $failedAndGroupedTasks;
+    /**
+     * @var array
+     */
+    private $failedAndGroupedTasks;
 
-    private string $infoMail;
+    /**
+     * @var string
+     */
+    private $infoMail;
 
-    private int $executionTimeout;
+    /**
+     * @var int
+     */
+    private $executionTimeout;
 
-    private bool $reset;
+    /**
+     * @var bool
+     */
+    private $reset;
 
     public function __construct(
         array $failedAndGroupedTasks,

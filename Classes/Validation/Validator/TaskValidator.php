@@ -13,6 +13,9 @@ namespace JWeiland\ResetScheduler\Validation\Validator;
 
 use TYPO3\CMS\Scheduler\Task\AbstractTask;
 
+/**
+ * SF: This is the original class content backported from EXT:scheduler of TYPO3 12
+ */
 class TaskValidator
 {
     /**

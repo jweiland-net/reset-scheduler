@@ -16,6 +16,7 @@ use TYPO3\CMS\Core\Localization\LanguageService;
 /**
  * Service class helping to retrieve data for EXT:scheduler
  * @internal This is not a public API method, do not use in own extensions
+ * SF: This is the original class content backported from EXT:scheduler of TYPO3 12
  */
 class TaskService
 {

@@ -25,12 +25,16 @@ use TYPO3\CMS\Scheduler\Task\AbstractTask;
 
 /**
  * Repository class to fetch tasks available in the systems ready to be executed
+ * SF: This is the original class content backported from EXT:scheduler of TYPO3 12
  */
 class SchedulerTaskRepository
 {
     protected const TABLE_NAME = 'tx_scheduler_task';
 
-    protected TaskSerializer $taskSerializer;
+    /**
+     * @var TaskSerializer
+     */
+    protected $taskSerializer;
 
     public function __construct(TaskSerializer $taskSerializer)
     {
@@ -258,7 +262,7 @@ class SchedulerTaskRepository
                 'g.description AS taskGroupDescription',
                 'g.uid AS taskGroupId',
                 'g.deleted AS isTaskGroupDeleted',
-                'g.hidden AS isTaskGroupHidden',
+                'g.hidden AS isTaskGroupHidden'
             )
             ->from(self::TABLE_NAME, 't')
             ->leftJoin(
@@ -404,7 +408,7 @@ class SchedulerTaskRepository
                 $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0, Connection::PARAM_INT)),
                 $queryBuilder->expr()->eq('disable', $queryBuilder->createNamedParameter(0, Connection::PARAM_INT)),
                 $queryBuilder->expr()->neq('nextexecution', $queryBuilder->createNamedParameter(0, Connection::PARAM_INT)),
-                $queryBuilder->expr()->lte('nextexecution', $queryBuilder->createNamedParameter($GLOBALS['EXEC_TIME'], Connection::PARAM_INT)),
+                $queryBuilder->expr()->lte('nextexecution', $queryBuilder->createNamedParameter($GLOBALS['EXEC_TIME'], Connection::PARAM_INT))
             );
 
         $result = $queryBuilder->execute();

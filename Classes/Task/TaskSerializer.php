@@ -18,6 +18,7 @@ use TYPO3\CMS\Scheduler\Task\AbstractTask;
  * Handles serialization of `AbstractTask` objects.
  *
  * @internal This is an internal API, avoid using it in custom implementations.
+ * SF: This is the original class content backported from EXT:scheduler of TYPO3 12
  */
 class TaskSerializer
 {
