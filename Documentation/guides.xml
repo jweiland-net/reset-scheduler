@@ -6,7 +6,7 @@
         input-format="rst">
     <project title="Reset Scheduler"
              release="0.1"
-             version="0.1.0"
+             version="0.1.1"
              copyright="by jweiland.net"/>
     <extension class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension"
                edit-on-github="jweiland-net/reset-scheduler"
