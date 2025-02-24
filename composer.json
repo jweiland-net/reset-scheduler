@@ -16,8 +16,8 @@
 		"email": "projects@jweiland.net"
 	},
 	"require": {
-		"typo3/cms-core": "^11.5 || ^12.4",
-		"typo3/cms-scheduler": "^11.5 || ^12.4"
+		"typo3/cms-core": "^12.4.25 || ^13.4.3",
+		"typo3/cms-scheduler": "^12.4.25 || ^13.4.3"
 	},
 	"replace": {
 		"typo3-ter/reset-scheduler": "self.version",
