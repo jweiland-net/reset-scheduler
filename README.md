@@ -31,3 +31,9 @@ Download and install `reset_scheduler` with the extension manager module.
 1) Install the extension
 2) Create new scheduler task: `Execute console commands (scheduler)`
 3) Schedulable Command: `scheduler:reset`
+
+## 3 Support
+
+Free Support is available via [GitHub Issue Tracker](https://github.com/jweiland-net/reset-scheduler/issues).
+
+For commercial support, please contact us at [support@jweiland.net](support@jweiland.net).
